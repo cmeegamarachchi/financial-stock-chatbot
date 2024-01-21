@@ -1,0 +1,26 @@
+{
+	"name": "Financial Stock Assistant Chatbot with ChatGPT in Python",
+	"image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
+	"forwardPorts": [8501],
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"[python]": {
+					"editor.formatOnSave": true,
+					"editor.defaultFormatter": "ms-python.black-formatter"
+				},
+				"workbench.iconTheme": "material-icon-theme"
+			  },
+			"extensions": [
+				"PKief.material-icon-theme",
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-python.black-formatter"
+			]
+		}
+	},
+	"postCreateCommand": "npm install --global prettier && pip install --upgrade pip && pip install black openai pandas matplotlib yfinance streamlit",
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {}
+	}
+}
