@@ -7,6 +7,7 @@ import yfinance as yf
 
 # credit: https://www.youtube.com/watch?v=9y9YYhCuLro&list=PLxFYCJW9AKJtoGL2-OwHQU7G3q1-I9KlP
 
+
 def openai_init():
     client = OpenAI(api_key=open("api.key", "r").read())
     return client
@@ -30,7 +31,7 @@ def plot_stock_price(ticker: str):
     data = yf.Ticker(ticker).history(period="1y")
     plt.figure(figsize=(10, 5))
     plt.plot(data.index, data["Close"])
-    plt.title("{ticker} Stock Price over last year")
+    plt.title(f"{ticker} Stock Price over last year")
     plt.xlabel("Date")
     plt.ylabel("Price")
     plt.grid(True)
@@ -145,16 +146,14 @@ def main():
 
             if response_message.function_call:
                 function_name = response_message.function_call.name
-                function_args = json.loads(
-                    response_message.function_call.arguments
-                )
-				
+                function_args = json.loads(response_message.function_call.arguments)
+
                 if function_name in ["get_stock_price", "plot_stock_price"]:
-                    args_dict = {"ticker": function_args['ticker']}
+                    args_dict = {"ticker": function_args["ticker"]}
                 elif function_name in ["calculate_SMA", "calculate_EMA"]:
                     args_dict = {
-                        "ticker": function_args['ticker'],
-                        "window": function_args['window'],
+                        "ticker": function_args["ticker"],
+                        "window": function_args["window"],
                     }
 
                 function_to_call = available_functions[function_name]
@@ -165,11 +164,7 @@ def main():
                 else:
                     st.session_state[MESSAGE_STORE].append(response_message)
                     st.session_state[MESSAGE_STORE].append(
-						{
-							'role': 'function',
-							'name': function_name,
-							'content': response
-						}
+                        {"role": "function", "name": function_name, "content": response}
                     )
 
                 second_response_message = client.chat.completions.create(
@@ -177,25 +172,23 @@ def main():
                     messages=st.session_state[MESSAGE_STORE],
                 )
 
-                st.text(second_response_message.choices[0].message.content)
-				
+                st.markdown(second_response_message.choices[0].message.content)
+
                 st.session_state[MESSAGE_STORE].append(
                     {
-                        'role': 'assistant',
-                        'content': second_response_message.choices[0].message.content
+                        "role": "assistant",
+                        "content": second_response_message.choices[0].message.content,
                     }
-				)	
+                )
             else:
                 st.text(response_message.content)
-				
+
                 st.session_state[MESSAGE_STORE].append(
-                    {
-                        'role': 'assistant',
-                        'content': response_message.content
-                    }
-				)	
+                    {"role": "assistant", "content": response_message.content}
+                )
         except Exception as e:
             st.text(e)
+
 
 if __name__ == "__main__":
     main()
